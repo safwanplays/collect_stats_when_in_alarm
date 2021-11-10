@@ -27,27 +27,11 @@ At some point the instance will be terminated. When that happens we don't want t
 
 Issues: 
 
-Issue#1 This will conflict with autoscaling instances. The scenario will be:
-
-autoscaling spins up an instance
-
-when running the lambda function creates an alarm
-
-if the alarm triggers, lambda will stop the instance for later inspection
-
-autoscaling will notice the instance is stopped, will terminate and remove it from the autoscaling group.
-
-when terminated, lambda will remove the alarm
-
-So we won't have a chance to inspect the instance for any issues. Once the alarm triggers, the instance will be terminated shortly which is not what we want. We want this instance to linger so that we can inspect and find out why the alarm occurred.
-
 
 Room for improvement: 
 
 This process currently work only for a single region. It would be better if we could make it work for all region. That way we wont have to write this for every single region.
 
-
-From the issues section, we see how it can conflict with autoscaling. One thing we can do is, we can create alarm based on the existence of a specific tag like alarm_enable=yes      ### done
 
 One very big improvement would be the ability to select the alarm using tag. Suppose the lambda function offers a variety of alarm ranging from cpu to custom metrics. One could add a tag on the instance saying memory_alarm=yes and the lambda would enable/create the alarm just for memory. For this to happen lamba will have to have an array of alarms that the user can choose from. Creating only one specific alarm as the current version does is not very useful in practical life. Being able to create alarm based on the customer need would be a great feat.   ###done
 

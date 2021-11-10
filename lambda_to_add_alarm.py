@@ -23,10 +23,10 @@ def lambda_handler(event, context):
             print("There is no tag requesting alarms. so skipping ...")
             return 200
         print(tags)
-        ## If this is a part of an autoscaling group, we wont process this instance
-        if "aws:autoscaling:groupName" in tags:
-            print("Won't add any alarm since this is a part of an autoscaling group")
-            return 200
+        ## If you don't want to process instances that are part of an autoscaling group hash out the next three lines
+        #if "aws:autoscaling:groupName" in tags:
+            #print("Won't add any alarm since this is a part of an autoscaling group")
+            #return 200
 
         ## Take a list of alrams that were requested. Suppose we have two types of alarms available like cpu, disk right now. if the tag has cpu-alarm=yes then we will add the cpu alarm, if it has disk-alarm=yes then we will add memory alarm. We can add more alarm as we go. This is just for demostration
         if "cpu-alarm" in tags and tags["cpu-alarm"] == "yes":
@@ -90,7 +90,7 @@ def create_cpu_alarm(region, instance_id):
     		AlarmDescription = "This metric monitors ec2 cpu utilization",
     		AlarmActions     = [sns_topic]  
     		#alarm_actions     = [will need to pass as an environmental variable]  
-                    ## does it need iam permission to trigger the sns. Here the alarm needs to trigger the sns and lambda is creating the alarm not the user who wrote this lambda. so if lambda has to pass the permission to the sns, it needs the IAM PassRole permission. This is different than when I am creating an alarm in terrafrom by myself. On the other hand we can attach a policy to the SNS topic so that this alarm can publish here. This will be the recommended approach.
+                ## does it need iam permission to trigger the sns? Here the alarm needs to trigger the sns and lambda is creating the alarm not the user who wrote this lambda. so if lambda has to pass the permission to the sns, it needs the IAM PassRole permission. This is different than when I am creating an alarm in terrafrom by myself. On the other hand we can attach a policy to the SNS topic so that this alarm can publish here. This will be the recommended approach.
             )
             print("The alarm was created with the name ",alarm_name)
         except ClientError:
