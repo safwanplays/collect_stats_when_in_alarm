@@ -1,0 +1,75 @@
+### First lambda function components in terraform
+
+the lambda function itself, the .py file and an archive block that zips it
+
+The alarm definition that will be put in the .py file
+
+a role for this lambda function
+
+a policy for this role: This lambda will need create log group in cloudwatch, put logs in cloudwatch, describe log group to make sure if its already created,create log streams, describe log streams. For cloudwatch, it will need to describe alarm to see if it is already created or not, create the alarm and finally delete the alarm when the instance is terminated. To check the status of the EC2 instance's state, it will need to describe the instance as well. So there is three sets of permission/policy for this lambda
+
+
+a policy attachment to attach the policy to the role
+
+a lambda definition to create the lambda function
+
+##########################################################################
+
+### The cloudwatch event that will trigger the lambda and its related components
+
+The event describing what we need to capture
+
+An event target that will point to the lambda
+
+Permission to trigger the lambda from cloudwatch 
+
+
+
+
+##########################################################################
+
+## The second lambda function and its related components
+
+the lambda function itself, the .py file and an archive block that zips it
+
+A role for the lambda function
+
+A policy for the role: Necessary cloudwatch policy to put/describe logs/streams.This lambda function will run a document via ssm. So it will need to have permission for that too. So in total two sets of permission; one for the logs and one for the ssm. 
+
+The ec2 instance on which this ssm document will run needs to have ssm agent installed and a policy/role attached that allows SSM to work on it. This is an implicit requirement and we might not always have it configured that way. 
+
+
+a policy attachment block
+
+a lambda definition block
+
+
+#############################################################################
+
+an ssm document that will be run by the second lambda function
+
+###  Mixed components/ Glue components
+
+We can't call a lambda function directly from the alarm. What we can do is, publish to an Sns topic, that sns notification can call the lambda function.
+
+create an sns topic
+
+The alarm on the first lambda needs to know the sns topic arn. We will make it available as an environmental variable on the first lambda definition
+
+A resource policy for the Sns so that the alarm can publish to it
+
+subscribe lambda function2 for the topic so that 2nd lambda gets triggered by it.
+
+a permission for the sns topic so that it can trigger the second lambda function
+
+
+
+
+
+
+
+
+
+
+
+

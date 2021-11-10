@@ -1,0 +1,84 @@
+##sample capture pattern
+{
+  "source": ["aws.ec2"],
+  "detail-type": ["EC2 Instance State-change Notification"],
+  "detail": {
+    "state": ["running", "terminated"]
+  }
+}
+
+
+
+## sample test pattern
+{
+  "version": "0",
+  "id": "ee376907-2647-4179-9203-343cfb3017a4",
+  "detail-type": "EC2 Instance State-change Notification",
+  "source": "aws.ec2",
+  "account": "123456789012",
+  "time": "2015-11-11T21:30:34Z",
+  "region": "us-east-1",
+  "resources": ["arn:aws:ec2:us-east-1:123456789012:instance/i-abcd1111"],
+  "detail": {
+    "instance-id": "i-abcd1111",
+    "state": "running"
+  }
+}
+
+
+### sample pattern I got from the alarm action lambda
+{
+"Records": [
+{
+"EventSource": "aws:sns",
+"EventVersion": "1.0",
+"EventSubscriptionArn": "arn:aws:sns:us-east-2:127573843669:topic_for_cpu_alarm_lambda01:7f4783f4-0f59-44bd-87b3-c3ab4df27483",
+"Sns": {
+"Type": "Notification",
+"MessageId": "1feb5765-98ae-541c-a6e9-0e9b9b1de1d4",
+"TopicArn": "arn:aws:sns:us-east-2:127573843669:topic_for_cpu_alarm_lambda01",
+"Subject": "ALARM: \"alarm01_us-east-2_i-0b40501769fb91099\" in US East (Ohio)",
+"Message": "{\"AlarmName\":\"alarm01_us-east-2_i-0b40501769fb91099\",\"AlarmDescription\":\"This metric monitors ec2 cpu utilization\",\"AWSAccountId\":\"127573843669\",\"NewStateValue\":\"ALARM\",\"NewStateReason\":\"Threshold Crossed: 1 out of the last 1 datapoints [99.76271186440678 (04/11/21 15:45:00)] was greater than or equal to the threshold (50.0) (minimum 1 datapoint for OK -> ALARM transition).\",\"StateChangeTime\":\"2021-11-04T15:51:15.651+0000\",\"Region\":\"US East (Ohio)\",\"AlarmArn\":\"arn:aws:cloudwatch:us-east-2:127573843669:alarm:alarm01_us-east-2_i-0b40501769fb91099\",\"OldStateValue\":\"INSUFFICIENT_DATA\",\"Trigger\":{\"MetricName\":\"CPUUtilization\",\"Namespace\":\"AWS/EC2\",\"StatisticType\":\"Statistic\",\"Statistic\":\"AVERAGE\",\"Unit\":null,\"Dimensions\":[{\"value\":\"i-0b40501769fb91099\",\"name\":\"InstanceId\"}],\"Period\":60,\"EvaluationPeriods\":1,\"ComparisonOperator\":\"GreaterThanOrEqualToThreshold\",\"Threshold\":50.0,\"TreatMissingData\":\"\",\"EvaluateLowSampleCountPercentile\":\"\"}}",
+"Timestamp": "2021-11-04T15:51:15.700Z",
+"SignatureVersion": "1",
+"Signature": "fl2hg7NtLb7qSqOgOqA27TlP7HdIhgT/RLeWW7mFpo310kCV6VniWJj8/NDuCo0InQuRg6ggGLXgreVT/va5ZhSLQX0hoCaG1trl2GEoKONndWgMquDeG2DReZGO2tuVchjnvQw6SXqBOpXJhS/EoI862Nit9ii0yvcsl9vSGL+5YvG+duLHUijiDxVCEP6wb9GDkCoYxn5xqMeLAI4VCNvv6qDG6KciVJE9MH5+2DkquXSeoG76TgVtPErYZmP61D9uUYrpjrJ2zkY88qfvPAgoGq1cej2/1c9T9jpxsdYdjEvVjIrXSBXCDAGUI22LpFvQ9reVeGvrD9WZElOrmw==",
+"SigningCertUrl": "https://sns.us-east-2.amazonaws.com/SimpleNotificationService-7ff5318490ec183fbaddaa2a969abfda.pem",
+"UnsubscribeUrl": "https://sns.us-east-2.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-2:127573843669:topic_for_cpu_alarm_lambda01:7f4783f4-0f59-44bd-87b3-c3ab4df27483",
+"MessageAttributes": 
+{}
+
+}
+}
+]
+}
+####### printed with json
+>>> print(json.dumps(d1, indent=4))
+{
+    "Records": [
+        {
+            "EventSource": "aws:sns",
+            "EventVersion": "1.0",
+            "EventSubscriptionArn": "arn:aws:sns:us-east-2:127573843669:topic_for_cpu_alarm_lambda01:7f4783f4-0f59-44bd-87b3-c3ab4df27483",
+            "Sns": {
+                "Type": "Notification",
+                "MessageId": "1feb5765-98ae-541c-a6e9-0e9b9b1de1d4",
+                "TopicArn": "arn:aws:sns:us-east-2:127573843669:topic_for_cpu_alarm_lambda01",
+                "Subject": "ALARM: \"alarm01_us-east-2_i-0b40501769fb91099\" in US East (Ohio)",
+                "Message": "{\"AlarmName\":\"alarm01_us-east-2_i-0b40501769fb91099\",\"AlarmDescription\":\"This metric monitors ec2 cpu utilization\",\"AWSAccountId\":\"127573843669\",\"NewStateValue\":\"ALARM\",\"NewStateReason\":\"Threshold Crossed: 1 out of the last 1 datapoints [99.76271186440678 (04/11/21 15:45:00)] was greater than or equal to the threshold (50.0) (minimum 1 datapoint for OK -> ALARM transition).\",\"StateChangeTime\":\"2021-11-04T15:51:15.651+0000\",\"Region\":\"US East (Ohio)\",\"AlarmArn\":\"arn:aws:cloudwatch:us-east-2:127573843669:alarm:alarm01_us-east-2_i-0b40501769fb91099\",\"OldStateValue\":\"INSUFFICIENT_DATA\",\"Trigger\":{\"MetricName\":\"CPUUtilization\",\"Namespace\":\"AWS/EC2\",\"StatisticType\":\"Statistic\",\"Statistic\":\"AVERAGE\",\"Unit\":null,\"Dimensions\":[{\"value\":\"i-0b40501769fb91099\",\"name\":\"InstanceId\"}],\"Period\":60,\"EvaluationPeriods\":1,\"ComparisonOperator\":\"GreaterThanOrEqualToThreshold\",\"Threshold\":50.0,\"TreatMissingData\":\"\",\"EvaluateLowSampleCountPercentile\":\"\"}}",
+                "Timestamp": "2021-11-04T15:51:15.700Z",
+                "SignatureVersion": "1",
+                "Signature": "fl2hg7NtLb7qSqOgOqA27TlP7HdIhgT/RLeWW7mFpo310kCV6VniWJj8/NDuCo0InQuRg6ggGLXgreVT/va5ZhSLQX0hoCaG1trl2GEoKONndWgMquDeG2DReZGO2tuVchjnvQw6SXqBOpXJhS/EoI862Nit9ii0yvcsl9vSGL+5YvG+duLHUijiDxVCEP6wb9GDkCoYxn5xqMeLAI4VCNvv6qDG6KciVJE9MH5+2DkquXSeoG76TgVtPErYZmP61D9uUYrpjrJ2zkY88qfvPAgoGq1cej2/1c9T9jpxsdYdjEvVjIrXSBXCDAGUI22LpFvQ9reVeGvrD9WZElOrmw==",
+                "SigningCertUrl": "https://sns.us-east-2.amazonaws.com/SimpleNotificationService-7ff5318490ec183fbaddaa2a969abfda.pem",
+                "UnsubscribeUrl": "https://sns.us-east-2.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-2:127573843669:topic_for_cpu_alarm_lambda01:7f4783f4-0f59-44bd-87b3-c3ab4df27483",
+                "MessageAttributes": {}
+            }
+        }
+    ]
+}
+
+
+
+####################################
+{"AlarmName":"alarm01_us-east-2_i-0b40501769fb91099","AlarmDescription":"This metric monitors ec2 cpu utilization","AWSAccountId":"127573843669","NewStateValue":"ALARM","NewStateReason":"Threshold Crossed: 1 out of the last 1 datapoints [99.76271186440678 (04/11/21 15:45:00)] was greater than or equal to the threshold (50.0) (minimum 1 datapoint for OK -> ALARM transition).","StateChangeTime":"2021-11-04T15:51:15.651+0000","Region":"US East (Ohio)","AlarmArn":"arn:aws:cloudwatch:us-east-2:127573843669:alarm:alarm01_us-east-2_i-0b40501769fb91099","OldStateValue":"INSUFFICIENT_DATA","Trigger":{"MetricName":"CPUUtilization","Namespace":"AWS/EC2","StatisticType":"Statistic","Statistic":"AVERAGE","Unit":"null","Dimensions":[{"value":"i-0b40501769fb91099","name":"InstanceId"}],"Period":60,"EvaluationPeriods":1,"ComparisonOperator":"GreaterThanOrEqualToThreshold","Threshold":50.0,"TreatMissingData":"","EvaluateLowSampleCountPercentile":""}}
+
+

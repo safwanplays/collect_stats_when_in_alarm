@@ -1,0 +1,78 @@
+Goal: Need to add a lambda function which will trigger when an instance is in running state. It will add some alarm for this instance based on some tags that define what sort of alarm it wants configured. This lambda will also trigger when the instance is terminated to clean up all the alarms it has created earlier.
+
+The function of the alarm would be to trigger another lambda function which will run an SSM document on the instance and collect some statistics and send the result via an email. 
+
+
+
+Expectation and Reality: I wanted an alarm that will get attached with any instances and when the alarm triggers it would send the alarm with the instance id of the instance. This does not seem possible. There is no such mechanism where an alarm will be configured on a metric and whenever there is an instance with that metric comes along, it will get registered under this alarm. we probably can get all the instances(present and future) under an alarm but then again the alarm that I am expecting(like send an alarm when the cpu utilization is high with the specific instance ID) will not be possible because in that case I will get a notification with all the instance IDs that are under this alarm.
+
+
+What can be done: Since we can't write a single alarm for all the instances, we have to write it for every single instances that gets created. We can choose to create alarm for every instances that gets created or we can do it selectively using tags
+
+
+One way to do it: I will create a lambda that get's triggered whenever there is a new instance. This will create an alarm for this particular instance and add the instance id on one of its dimentions. That way when we get the notification for the alarm we will be able to extract the instance id from it and do whatever we want on that specific instance.  Now if this alarm is monitoring a metric that is not published by the instance that gets generated, then there will be no point creating this alarm. But for a very common metric like cpu utilization, this will work. An enterprise level solution would be to restrict user to using a/some approved AMI that has cloudwatch agent installed and configured to post a specific metric that will get monitored by the alarm. 
+
+As a cleanup plan we will need to delete the alarm everytime the instance gets terminated
+
+
+Work plan
+
+Catch any event for ec2 creation.Whenever an instance is on "running" state,a lambda should be triggered that will take the instance id and create an alarm with instance id as a dimension. We could also add the instance name while constructing the alarmname, that way extracting the instance name will be easier. Once lambda receives an event for "running" state of an instance, it will check to see if there is any existing alarm for this instance.The check will be based on the name of the alarm which was constructed with a set rule. If the alarm was already created (may be the instance has come back from a stopped state) then do nothing. If this is a new instance, lambda will create an alarm for this.
+
+If this alarm kicks off,another lambda will stop the instance so that later we can inspect what happened to the instance. this stop action can be replaced with any other action depending on the situation, so can be the alarm. We cannot trigger a lambda directly from an alarm. so we will need an SNS topic for the alarm which will in turn call the lambda function. I will check more if there is a way to trigger a lambda directly from an alarm rather than using an SNS.
+
+
+At some point the instance will be terminated. When that happens we don't want the alarm for the instance lounging around. So we will create another lambda function that will trigger and clean up the alarm when the instance gets terminated. Rather than creating anothe lambda, we will process this from the first lambda function that created the alarm. We will design the lambda to check the state of the instance. If it is running then it will create alarm, if it is terminated, it will delete the alarm.
+
+
+Issues: 
+
+Issue#1 This will conflict with autoscaling instances. The scenario will be:
+
+autoscaling spins up an instance
+
+when running the lambda function creates an alarm
+
+if the alarm triggers, lambda will stop the instance for later inspection
+
+autoscaling will notice the instance is stopped, will terminate and remove it from the autoscaling group.
+
+when terminated, lambda will remove the alarm
+
+So we won't have a chance to inspect the instance for any issues. Once the alarm triggers, the instance will be terminated shortly which is not what we want. We want this instance to linger so that we can inspect and find out why the alarm occurred.
+
+
+Room for improvement: 
+
+This process currently work only for a single region. It would be better if we could make it work for all region. That way we wont have to write this for every single region.
+
+
+From the issues section, we see how it can conflict with autoscaling. One thing we can do is, we can create alarm based on the existence of a specific tag like alarm_enable=yes      ### done
+
+One very big improvement would be the ability to select the alarm using tag. Suppose the lambda function offers a variety of alarm ranging from cpu to custom metrics. One could add a tag on the instance saying memory_alarm=yes and the lambda would enable/create the alarm just for memory. For this to happen lamba will have to have an array of alarms that the user can choose from. Creating only one specific alarm as the current version does is not very useful in practical life. Being able to create alarm based on the customer need would be a great feat.   ###done
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
