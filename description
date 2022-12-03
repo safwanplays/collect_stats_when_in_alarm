@@ -36,9 +36,13 @@ This process currently work only for a single region. It would be better if we c
 One very big improvement would be the ability to select the alarm using tag. Suppose the lambda function offers a variety of alarm ranging from cpu to custom metrics. One could add a tag on the instance saying memory_alarm=yes and the lambda would enable/create the alarm just for memory. For this to happen lamba will have to have an array of alarms that the user can choose from. Creating only one specific alarm as the current version does is not very useful in practical life. Being able to create alarm based on the customer need would be a great feat.   ###done
 
 
+
 comment #1
 
 comment #2
+
+comment #3
+
 
 
 
